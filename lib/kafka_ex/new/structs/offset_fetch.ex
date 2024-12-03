@@ -9,7 +9,7 @@ defmodule KafkaEx.New.Structs.OffsetFetch do
 
   @type consumer_group :: String.t()
   @type t :: %__MODULE__{
-          consumer_group: consumer_group,
+          consumer_group: KafkaEx.Types.consumer_group_name(),
           topics: [TopicOffsets.t()]
         }
 

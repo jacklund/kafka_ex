@@ -156,8 +156,18 @@ defmodule KafkaEx.New.Client do
     {:reply, {:ok, topic_metadata}, updated_state}
   end
 
+  ################################################################################
+  ########################### Offset Management ##################################
+  ################################################################################
   def handle_call({:list_offsets, [{topic, partitions_data}], opts}, _from, state) do
     case list_offset_request({topic, partitions_data}, opts, state) do
+      {:error, error} -> {:reply, {:error, error}, state}
+      {result, updated_state} -> {:reply, result, updated_state}
+    end
+  end
+
+  def handle_call({:offset_fetch, consumer_group, [{topic, [partition_id]}], opts}, _from, state) do
+    case offset_fetch_request(consumer_group, [{topic, [partition_id]}], opts, state) do
       {:error, error} -> {:reply, {:error, error}, state}
       {result, updated_state} -> {:reply, result, updated_state}
     end
@@ -173,6 +183,9 @@ defmodule KafkaEx.New.Client do
     end
   end
 
+  ################################################################################
+  ########################### Group Management ##################################
+  ################################################################################
   def handle_call({:describe_groups, [consumer_group_name], opts}, _from, state) do
     if KafkaEx.valid_consumer_group?(consumer_group_name) do
       case describe_group_request(consumer_group_name, opts, state) do
@@ -276,6 +289,16 @@ defmodule KafkaEx.New.Client do
 
     case RequestBuilder.lists_offset_request(req_data, state) do
       {:ok, request} -> handle_lists_offsets_request(request, node_selector, state)
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp offset_fetch_request(consumer_group, [{topic, [partition]}], opts, state) do
+    node_selector = NodeSelector.consumer_group(consumer_group)
+    req_data = [{:consumer_group, consumer_group}, {:topics, [{topic, [partition]}]} | opts]
+
+    case RequestBuilder.offset_fetch_request(req_data, state) do
+      {:ok, request} -> handle_offset_fetch_request(request, node_selector, state)
       {:error, error} -> {:error, error}
     end
   end

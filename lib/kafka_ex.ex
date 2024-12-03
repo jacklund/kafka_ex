@@ -356,8 +356,7 @@ defmodule KafkaEx do
     Server.call(worker_name, {:offset_commit, offset_commit_request})
   end
 
-  @spec offset_fetch(atom, OffsetFetchRequest.t()) ::
-          [OffsetFetchResponse.t()] | :topic_not_found
+  @spec offset_fetch(atom, OffsetFetchRequest.t()) :: [OffsetFetchResponse.t()] | :topic_not_found
   def offset_fetch(worker_name, offset_fetch_request) do
     Server.call(worker_name, {:offset_fetch, offset_fetch_request})
   end

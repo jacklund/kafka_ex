@@ -9,7 +9,7 @@ defmodule KafkaEx.New.Structs.OffsetFetch.TopicOffsets do
   @type topic :: String.t()
 
   @type t :: %__MODULE__{
-          topic: topic,
+          topic: KafkaEx.Types.topic(),
           committed_offsets: [CommittedOffset.t()]
         }
 

@@ -92,6 +92,19 @@ defmodule KafkaEx.New.KafkaExAPI do
   end
 
   @doc """
+  Sends a request to fetch the offsets for a given consumer group
+  Currently we support only one consumer group, topic and partition per request
+  """
+  @spec offset_fetch(client, consumer_group_name, [{topic_name, [partition_id]}]) ::
+          {:ok, list(Offset.t())} | {:error, any}
+  def offset_fetch(client, consumer_group, [{topic, [partition_id]}], opts \\ []) do
+    case GenServer.call(client, {:offset_fetch, consumer_group, [{topic, [partition_id]}], opts}) do
+      {:ok, offsets} -> {:ok, offsets}
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  @doc """
   Get topic metadata for the given topics
 
   Always calls out to the broker to get the most up-to-date metadata (and

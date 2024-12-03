@@ -8,7 +8,7 @@ defmodule KafkaEx.Types do
   Integer representing error code returned by kafka
   0 means no error, any other value matches some error
   """
-  @type error_code :: integer
+  @type error_code :: integer | atom
 
   @typedoc """
   Topic name UTF-8 Encoded
@@ -42,4 +42,9 @@ defmodule KafkaEx.Types do
   Consumer group name UTF-8 encoded
   """
   @type consumer_group_name :: String.t()
+
+  @typedoc """
+  Metadata UTF-8 encoded
+  """
+  @type metadata :: String.t()
 end

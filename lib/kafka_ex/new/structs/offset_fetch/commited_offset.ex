@@ -5,16 +5,11 @@ defmodule KafkaEx.New.Structs.OffsetFetch.CommittedOffset do
   """
   defstruct [:partition, :offset, :metadata, :error_code]
 
-  @type partition :: integer()
-  @type offset :: integer()
-  @type metadata :: String.t()
-  @type error_code :: KafkaEx.error_code() | atom()
-
   @type t :: %__MODULE__{
-          partition: partition,
-          offset: offset,
-          metadata: metadata,
-          error_code: error_code
+          partition: KafkaEx.Types.partition(),
+          offset: KafkaEx.Types.offset(),
+          metadata: KafkaEx.Types.metadata(),
+          error_code: KafkaEx.Types.error_code()
         }
 
   @spec from_offset_fetch(map) :: __MODULE__.t()
