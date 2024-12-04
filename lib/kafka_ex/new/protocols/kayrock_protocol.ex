@@ -37,4 +37,8 @@ defmodule KafkaEx.New.Protocols.KayrockProtocol do
   def parse_response(:list_offsets, response) do
     KayrockProtocol.ListOffsets.Response.parse_response(response)
   end
+
+  def parse_response(:offset_fetch, response) do
+    KayrockProtocol.OffsetFetch.Response.parse_response(response)
+  end
 end

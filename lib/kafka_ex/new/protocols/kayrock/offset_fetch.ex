@@ -1,4 +1,4 @@
-defmodule KafkaEx.New.Protocols.OffsetFetch do
+defmodule KafkaEx.New.Protocols.Kayrock.OffsetFetch do
   @moduledoc """
   This module implements the Offset Fetch protocol..
   Request is built using Kayrock protocol, response is parsed to
@@ -19,7 +19,7 @@ defmodule KafkaEx.New.Protocols.OffsetFetch do
     """
     alias KafkaEx.New.Structs.Offset
 
-    @spec parse_response(t()) :: {:ok, [Offset.t()]} | {:error, term}
-    def parse_response(response)
+    @spec parse_response(t(), KafkaEx.Types.consumer_group_name()) :: {:ok, [Offset.t()]} | {:error, term}
+    def parse_response(response, consumer_group)
   end
 end

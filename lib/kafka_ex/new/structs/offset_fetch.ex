@@ -17,7 +17,7 @@ defmodule KafkaEx.New.Structs.OffsetFetch do
   def from_offset_fetch(consumer_group, response) do
     %__MODULE__{
       consumer_group: consumer_group,
-      topics: Enum.map(response.topics, &TopicOffsets.from_offset_fetch/1)
+      topics: Enum.map(response.responses, &TopicOffsets.from_offset_fetch/1)
     }
   end
 end
