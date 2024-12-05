@@ -305,11 +305,15 @@ defmodule KafkaEx.New.Client do
 
   # ----------------------------------------------------------------------------------------------------
   defp handle_describe_group_request(request, node_selector, state) do
-    handle_request_with_retry(request, &ResponseParser.describe_groups_response/1, node_selector, state)
+    handle_request_with_retry(request, &ResponseParser.describe_groups_response/2, node_selector, state)
   end
 
   defp handle_lists_offsets_request(request, node_selector, state) do
-    handle_request_with_retry(request, &ResponseParser.list_offsets_response/1, node_selector, state)
+    handle_request_with_retry(request, &ResponseParser.list_offsets_response/2, node_selector, state)
+  end
+
+  defp handle_offset_fetch_request(request, node_selector, state) do
+    handle_request_with_retry(request, &ResponseParser.offset_fetch_response/2, node_selector, state)
   end
 
   # ----------------------------------------------------------------------------------------------------
@@ -322,7 +326,7 @@ defmodule KafkaEx.New.Client do
   defp handle_request_with_retry(request, parser_fn, node_selector, state, retry_count, _last_error) do
     case kayrock_network_request(request, node_selector, state) do
       {{:ok, response}, state_out} ->
-        case parser_fn.(response) do
+        case parser_fn.(response, request) do
           {:ok, result} ->
             {{:ok, result}, state_out}
 

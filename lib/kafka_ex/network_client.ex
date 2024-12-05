@@ -9,26 +9,13 @@ defmodule KafkaEx.NetworkClient do
 
   @impl true
   def create_socket(host, port, ssl_options \\ [], use_ssl \\ false) do
-    case Socket.create(
-           format_host(host),
-           port,
-           build_socket_options(ssl_options),
-           use_ssl
-         ) do
+    case Socket.create(format_host(host), port, build_socket_options(ssl_options), use_ssl) do
       {:ok, socket} ->
-        Logger.log(
-          :debug,
-          "Successfully connected to broker #{inspect(host)}:#{inspect(port)}"
-        )
-
+        Logger.debug("Successfully connected to broker #{format_broker_url(host, port)}")
         socket
 
       err ->
-        Logger.log(
-          :error,
-          "Could not connect to broker #{inspect(host)}:#{inspect(port)} because of error #{inspect(err)}"
-        )
-
+        Logger.error("Could not connect to broker #{format_broker_url(host, port)} because of error #{inspect(err)}")
         nil
     end
   end
@@ -45,10 +32,8 @@ defmodule KafkaEx.NetworkClient do
       :ok ->
         :ok
 
-      {_, reason} ->
-        Logger.log(
-          :error,
-          "Asynchronously sending data to broker #{inspect(broker.host)}:#{inspect(broker.port)} failed with #{inspect(reason)}"
+      {_, reason} -> Logger.error(
+          "Asynchronously sending data to broker #{format_broker_url(broker)} failed with #{inspect(reason)}"
         )
 
         reason
@@ -56,7 +41,7 @@ defmodule KafkaEx.NetworkClient do
   end
 
   @impl true
-  def send_sync_request(%{:socket => socket} = broker, data, timeout) do
+  def send_sync_request(%{socket: socket} = broker, data, timeout) when not is_nil(socket) do
     :ok = Socket.setopts(socket, [:binary, {:packet, 4}, {:active, false}])
 
     response =
@@ -65,32 +50,28 @@ defmodule KafkaEx.NetworkClient do
           case Socket.recv(socket, 0, timeout) do
             {:ok, data} ->
               :ok = Socket.setopts(socket, [:binary, {:packet, 4}, {:active, true}])
-
               data
 
             {:error, reason} ->
-              Logger.log(
-                :error,
-                "Receiving data from broker #{inspect(broker.host)}:#{inspect(broker.port)} failed with #{inspect(reason)}"
-              )
-
+              Logger.error("Receiving data from broker #{format_broker_url(broker)} failed with #{inspect(reason)}")
               Socket.close(socket)
 
               {:error, reason}
           end
 
         {_, reason} ->
-          Logger.log(
-            :error,
-            "Sending data to broker #{inspect(broker.host)}:#{inspect(broker.port)} failed with #{inspect(reason)}"
-          )
-
+          Logger.error("Sending data to broker #{format_broker_url(broker)} failed with #{inspect(reason)}")
           Socket.close(socket)
 
           {:error, reason}
       end
 
     response
+  end
+
+  def send_sync_request(%{socket: nil} = broker, _, _) do
+    Logger.error("No socket available for broker #{format_broker_url(broker)}")
+    {:error, :no_socket}
   end
 
   def send_sync_request(nil, _, _) do
@@ -119,5 +100,13 @@ defmodule KafkaEx.NetworkClient do
 
   defp build_socket_options(ssl_options) do
     build_socket_options([]) ++ ssl_options
+  end
+
+  defp format_broker_url(%{host: host, port: port}) do
+    format_broker_url(host, port)
+  end
+
+  defp format_broker_url(host, port) do
+    "#{inspect(host)}:#{inspect(port)}"
   end
 end

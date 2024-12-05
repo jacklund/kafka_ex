@@ -25,20 +25,26 @@ defmodule KafkaEx.New.Protocols.KayrockProtocol do
     |> KayrockProtocol.ListOffsets.Request.build_request(opts)
   end
 
+  def build_request(:offset_fetch, api_version, opts) do
+    api_version
+    |> Kayrock.OffsetFetch.get_request_struct()
+    |> KayrockProtocol.OffsetFetch.Request.build_request(opts)
+  end
+
   # -----------------------------------------------------------------------------
   @doc """
   Parses response based on request type and response
   """
   @impl KafkaEx.New.Client.Protocol
-  def parse_response(:describe_groups, response) do
+  def parse_response(:describe_groups, response, _) do
     KayrockProtocol.DescribeGroups.Response.parse_response(response)
   end
 
-  def parse_response(:list_offsets, response) do
+  def parse_response(:list_offsets, response, _) do
     KayrockProtocol.ListOffsets.Response.parse_response(response)
   end
 
-  def parse_response(:offset_fetch, response) do
-    KayrockProtocol.OffsetFetch.Response.parse_response(response)
+  def parse_response(:offset_fetch, response, request) do
+    KayrockProtocol.OffsetFetch.Response.parse_response(response, request.group_id)
   end
 end

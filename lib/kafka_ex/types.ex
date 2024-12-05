@@ -47,4 +47,9 @@ defmodule KafkaEx.Types do
   Metadata UTF-8 encoded
   """
   @type metadata :: String.t()
+
+  @typedoc """
+  Integer representing a given request api version
+  """
+  @type api_version :: non_neg_integer
 end

@@ -12,16 +12,21 @@ defmodule KafkaEx.New.Client.ResponseParser do
   @doc """
   Parses response for Describe Groups API
   """
-  @spec describe_groups_response(term) :: {:ok, [ConsumerGroup.t()]} | {:error, term}
-  def describe_groups_response(response) do
-    @protocol.parse_response(:describe_groups, response)
+  def describe_groups_response(response, request) do
+    @protocol.parse_response(:describe_groups, response, request)
   end
 
   @doc """
   Parses response for List Groups API
   """
-  @spec list_offsets_response(term) :: {:ok, [Offset.t()]} | {:error, Error.t()}
-  def list_offsets_response(response) do
-    @protocol.parse_response(:list_offsets, response)
+  def list_offsets_response(response, request) do
+    @protocol.parse_response(:list_offsets, response, request)
+  end
+
+  @doc """
+  Parses response for Offset Fetch API
+  """
+  def offset_fetch_response(response, request) do
+    @protocol.parse_response(:offset_fetch, response, request)
   end
 end
